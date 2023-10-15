@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>최근 활동</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/my_style.css">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="/static/js/activities.js"></script>
+</head>
+<body>
+    <div class="menu" >
+        <!-- 상단메뉴가 자바스크립트를 통해서 삽입됨 -->
+    </div>
+    <div class="activity-container">
+        <!-- 활동 기록이 자바스크립트를 통해 삽입됨 -->
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $(".menu").load("/static/html/menu.html", function() {
+                $.getScript("/static/js/menu.js");
+            });
+        });
+
+        // 활동 기록 가져오기
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchActivities('/get_activities', '.activity-container');
+        });
+    </script>
+</body>
+</html>

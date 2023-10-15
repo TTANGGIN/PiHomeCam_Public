@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영상 확인</title>
+    <style>
+        
+    </style>
+    <link rel="stylesheet" type="text/css" href="/static/css/my_style.css">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+    <div class="menu" >
+        <!-- 상단메뉴가 자바스크립트를 통해서 삽입됨 -->
+    </div>
+    <h3>파일명 : {{ filename }}</h3>
+    <video width="640" height="480" controls>
+        <source src="{{ url_for('file', filename=filename) }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <script>
+        $(document).ready(function() {
+            $(".menu").load("/static/html/menu.html", function() {
+                $.getScript("/static/js/menu.js");
+            });
+        });
+    </script>
+</body>
+</html>

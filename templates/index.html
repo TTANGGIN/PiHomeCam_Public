@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>스마트 홈 보안 시스템</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/my_style.css">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/static/js/activities.js"></script>
+    <script>
+        $(document).ready(function() {
+            function update_temp_humidity() {
+            $.getJSON('/temp', function(data) {
+                $('#temperature').text(data.temperature);
+                $('#humidity').text(data.humidity);
+            });
+            }
+
+            update_temp_humidity();
+            setInterval(update_temp_humidity, 10000);
+        });
+
+
+        $(window).resize(function() {
+            // 화면 너비에 따라 비디오 피드의 크기를 조절
+            var windowWidth = $(window).width();
+            var videoFeedWidth = Math.min(640, windowWidth); // 최대 너비는 640px로 설정
+            $('#video_feed img').width(videoFeedWidth);
+        });
+
+    </script>
+  </head>
+  <body>
+    <div class="menu" >
+        <!-- 상단메뉴가 자바스크립트를 통해서 삽입됨 -->
+    </div>
+    <div class="content-container">
+    <div class="left-section">
+        <h3>실시간 영상</h3>
+        <div id="video_feed">
+            <img id="bg" src="{{ url_for('video_feed') }}">
+        </div>
+        <h3>온습도</h3>
+        <div id="temp-humidity" style="cursor:pointer;" onclick="window.location.href='/dhtchart'">
+            <p>Temperature: <span id="temperature"></span>°C</p>
+            <p>Humidity: <span id="humidity"></span>%</p>
+        </div>
+        <div id="control-container">
+            <div id="led-control">
+                <button id="toggle-led" data-led-status="off">LED OFF</button>
+            </div>
+            <div id="alart-control">
+                <button id="toggle-alart" data-alart-status="off">경보 발생</button>
+            </div>
+        </div>
+    </div>
+    <div class="right-section">
+        <!-- 활동 기록이 자바스크립트를 통해서 삽입됨 -->
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $(".menu").load("/static/html/menu.html", function() {
+                $.getScript("/static/js/menu.js");
+            });
+
+            $("#toggle-led").click(function() {
+                var ledStatus = $(this).attr("data-led-status");
+                var newStatus = ledStatus === "off" ? "on" : "off";
+                var url = "/" + (newStatus === "on" ? "led_on" : "led_off");
+                $.get(url, function() {
+                    $("#toggle-led").text("LED " + (newStatus === "on" ? "OFF" : "ON"));
+                    $("#toggle-led").attr("data-led-status", newStatus);
+                });
+            });
+
+            // LED 상태를 가져오는 함수
+            function update_led_status() {
+                $.getJSON('/led_status', function(data) {
+                    var ledStatus = data.status;
+                    $("#toggle-led").text("LED " + (ledStatus === "on" ? "OFF" : "ON"));
+                    $("#toggle-led").attr("data-led-status", ledStatus);
+                });
+            }
+
+            // 페이지 로드 시 LED 상태 업데이트
+            update_led_status();
+
+            // LED 상태 변경 시 스타일 업데이트
+            $("#toggle-led").click(function() {
+                var ledStatus = $(this).attr("data-led-status");
+                if (ledStatus === "on") {
+                    $(this).css({ "background-color": "#444", "color": "white" });
+                } else {
+                    $(this).css({ "background-color": "white", "color": "black" });
+                }
+            });
+
+            // 알람 상태를 가져오는 함수
+            function update_alart_status() {
+                $.getJSON('/alart_status', function(data) {
+                    var alartStatus = data.status;
+                    $("#toggle-alart").text(alartStatus === "on" ? "경보 끄기" : "경보 발생");
+                    $("#toggle-alart").attr("data-alart-status", alartStatus);
+                });
+            }
+        
+            // 페이지 로드 시 알람 상태 업데이트
+            update_alart_status();
+        
+            $("#toggle-alart").click(function() {
+                var alartStatus = $(this).attr("data-alart-status");
+                var newStatus = alartStatus === "off" ? "on" : "off";
+                var url = "/" + (newStatus === "on" ? "alart_on" : "alart_off");
+                $.get(url, function() {
+                    $("#toggle-alart").text(newStatus === "on" ? "경보 끄기" : "경보 발생");
+                    $("#toggle-alart").attr("data-alart-status", newStatus);
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchActivities('/get_activities', '.right-section');
+        });
+    </script>
+  </body>
+</html>

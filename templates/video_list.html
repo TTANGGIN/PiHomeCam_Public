@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영상 확인</title> 
+    <link rel="stylesheet" type="text/css" href="/static/css/my_style.css">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+    <div class="menu" >
+        <!-- 상단메뉴가 자바스크립트를 통해서 삽입됨 -->
+    </div>
+    <h3>영상 목록</h3>
+    <table border="1">
+        <tr>
+            <th>파일명</th>
+            <th>날짜</th>
+            <th>크기</th>
+        </tr>
+        {% for video in videos %}
+            <tr>
+                <td><a href="{{ url_for('video_player', filename=video.filename) }}">{{ video.filename }}</a></td>
+                <td>{{ video.date }}</td>
+                <td>{{ video.size }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            $(".menu").load("/static/html/menu.html", function() {
+                $.getScript("/static/js/menu.js");
+            });
+        });
+    </script>
+</body>
+</html>
